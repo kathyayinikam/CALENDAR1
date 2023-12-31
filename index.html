@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customizable Calendar</title>
+   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      background-image: url("back.jpg");
+            background-size:cover; /* Adjust as needed */
+    background-repeat: no-repeat;
+  }
+  .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #ffffff92;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      
+  }
+  h1 {
+      text-align: center;
+      color: #3498db;
+  }
+  label {
+      display: block;
+      margin: 10px 0; 
+  }
+  select, input, button {
+      margin: 10px 0;
+  }
+  .calendar {
+      margin-top: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: none;
+  }
+  .day {
+    padding: 4px;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+    font-size: 16px;
+    width: 78px;
+}
+  .day:last-child {
+      border-right: none;
+  }
+  .day:hover {
+      background-color: #f0f0f0;
+  }
+ .month{
+    height: 304px;
+  align-items: center;
+    background-position: cover;
+ 
+ }
+  .month1 {
+    background-color: #3498db;
+    color: #fff;
+    text-align: center;
+    padding: 4px;
+    font-size: 20px;
+    font-weight: 900;
+  }
+  .week{
+    display: grid;
+    text-align: center;
+    padding: 4px;
+    width: 65px;
+  }
+  .daysweek{
+    display: grid;
+    text-align: center;
+    padding: 4px;
+    width: 65px;
+  } 
+  .holiday {
+    color: red;
+  }
+ .days{
+ 
+  width: 600px;
+ }
+ #button {
+  background-color: #3498db;
+  color: white;
+  border-radius: 50px;
+  border: #3498db;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 900;
+}
+#button1 {
+  background-color: #3498db;
+  color: white;
+  border-radius: 50px;
+  border: #3498db;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.option{
+  display:flex;
+}
+.option1{
+  display:flex;
+}
+.option2{
+  display:flex;
+}
+.option3{
+  display:flex;
+}
+.option4{
+  display:flex;
+}
+   </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Personalized Calendar</h1>
+        <div class="option1">
+        <label for="languageDropdown">Select Language:</label>
+        <select id="languageDropdown" style="margin-left:10px;">
+          <optgroup label="International Languages">
+            <option value="en">English</option>
+            <option value="es">Spanish</option> 
+            <option value="ar">Arabic</option>
+            <option value="de">German</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>  
+          </optgroup>
+          <optgroup label="Indian Languages">
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+            <option value="te">Telugu</option>
+            <option value="ta">Tamil</option>
+            <option value="sa">Sanskrit</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="gom">Konkani</option>
+            <option value="mr">Marathi</option>
+          </optgroup>
+          
+        </select>
+        </div>
+        <div class="option">
+        <label>Select Weekly Holiday:</label>
+        <select id="weekholiday" style="margin-left:10px;">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+      </select>
+    </div>
+    <div class="option4">
+    <label for="orientationDropdown">Select Orientation:</label>
+    <select id="orientationDropdown" style="margin-left:10px;">
+      <option value="Rows">Rows</option>
+      <option value="columns">Columns</option>
+  </select>
+</div>
+        <div class="option3">
+        <label>Select Year:</label>
+        <select id="year" style="margin-left:10px;">
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2023">2023</option>
+      </select>
+      </div>
+     
+        <div class="option2">
+        <label for="fileInput">Select Holiday File:</label>
+        <input type="file" id="fileInput" accept=".txt"  style="margin-left:10px;">
+      </div>
+        <br>
+        
+       
+        
+        <br>
+        <button onclick="highlightDates()" id="button1">Preview Calendar</button>
+        <button id="button">Download Calendar</button>
+        <div id="calendarPreview" class="calendar"></div>
+    </div>
+    <script>
+      function highlightDates() {
+        
+        const year = document.getElementById('year').value;
+        const language = document.getElementById('languageDropdown').value;
+        const weekhol = parseInt(document.getElementById('weekholiday').value, 10);
+        const fileInput = document.getElementById('fileInput');
+        const orientation = document.getElementById('orientationDropdown').value;
+        if (fileInput.files.length > 0) {
+          const fileReader = new FileReader();
+          fileReader.onload = function (e) {
+            const fileContent = e.target.result.trim();
+            const dateStrings = fileContent.split('\n');
+            const holidays = dateStrings.map(dateString => new Date(dateString));
+            generateCalendar(year, language, holidays, orientation,weekhol);
+          };
+          fileReader.readAsText(fileInput.files[0]);
+        } else {
+          alert('Please select a file.');
+        }
+      }
+      function generateCalendar(year, language, holidays, orientation,weekhol) {
+        var calendarPreview = document.getElementById('calendarPreview');
+        calendarPreview.innerHTML = '';
+        for (let month = 0; month < 12; month++) {
+         
+          var monthContainer = document.createElement('div');
+          monthContainer.classList.add('month');
+
+          const firstday = new Date(year, month, 1);
+          const monthName = firstday.toLocaleString(language, { month: 'long' });
+          const lastday = new Date(year, month + 1, 0).getDate();
+
+          var monthHeader = document.createElement('div');
+          monthHeader.classList.add('month1');
+          monthHeader.textContent = monthName + ' ' + year;
+          
+          monthContainer.appendChild(monthHeader);
+        
+          var daysContainer = document.createElement('div');
+          daysContainer.classList.add('days');
+
+          var week = getWeekArray(language);
+         
+          var weekdays = document.createElement('div');
+          weekdays.classList.add('daysweek');
+          for (let i = 0; i < 7; i++) {
+            var day = document.createElement('div');
+            day.classList.add('day');
+            if (i === weekhol) {
+              day.classList.add('holiday');
+              day.style.color = 'red';
+            }
+            day.textContent = week[i];
+            weekdays.appendChild(day);
+            daysContainer.appendChild(weekdays);
+          }
+
+          let currentDay = 1;
+          let currentWeek = 1;
+
+          while (currentDay <= lastday) {
+            var weekContainer = document.createElement('div');
+            weekContainer.classList.add('week');
+            for (let i = 0; i < 7; i++) {
+              var dayContainer = document.createElement('div');
+              dayContainer.classList.add('day');
+
+              if (currentWeek === 1 && i < firstday.getDay()) {
+                dayContainer.textContent = "- ";
+              } else if (currentDay <= lastday) {
+                const currentDate = new Date(year, month, currentDay);
+                if (i === weekhol||(holidays.some(holiday => holiday.toLocaleString() === currentDate.toLocaleString()))) {
+                      dayContainer.style.color = 'red';
+                      holidays.includes(currentDate);
+                    } 
+                        dayContainer.textContent = currentDay;
+                currentDay++;
+                  }
+
+              weekContainer.appendChild(dayContainer);
+            }
+
+            daysContainer.appendChild(weekContainer);
+            if (daysContainer.children.length === 7) {
+              monthContainer.appendChild(daysContainer.cloneNode(true));
+              daysContainer.innerHTML = '';
+            }
+            if(orientation=='Rows'){
+              weekdays.style=' grid-template-rows:repeat(7, 1fr);';
+              weekContainer.style=' grid-template-rows:repeat(7, 1fr);';
+              daysContainer.style='display:flex';
+            }
+            else{
+              weekdays.style=' grid-template-columns:repeat(7, 1fr);';
+              weekContainer.style=' grid-template-columns:repeat(7, 1fr);';
+             
+             
+            }
+            currentWeek++;
+          }
+
+          monthContainer.appendChild(daysContainer);
+          calendarPreview.appendChild(monthContainer);
+        }
+
+        calendarPreview.style.display = 'flex';
+        calendarPreview.style.flexDirection = 'column';
+        week.style.gridTemplateRows = orientation === 'Rows' ? 'grid-template-rows:repeat(7, 1fr)' : 'grid-template-columns: repeat(7, 1fr)';
+        daysweek.style.gridTemplateRows = orientation === 'Rows' ?'grid-template-rows: repeat(7, 1fr)' : 'grid-template-columns: repeat(7, 1fr)';
+        days.style.display = orientation === 'columns' ? '' : 'flex';
+      }        
+
+      function getWeekArray(language) {
+        if (language === 'kn') {
+          return ["ಭಾನು", "ಸೋಮ", "ಮಂಗಳ", "ಬುಧ", "ಗುರು", "ಶುಕ್ರ", "ಶನಿ"];
+        } else if (language === 'es') {
+          return ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        }
+        else if(language=='ar'){
+            return ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        }
+        else if(language=="hi-IN"){
+            return["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
+        }
+       else if(language=="de"){
+             return ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+
+          }
+          else if(language=="ja"){
+            return ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+
+          }
+          else if(language=="zh"){
+            return  ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+          }
+        
+         else if(language=="en"){
+          return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        }
+        else if (language === 'kn') {
+          return ["ಭಾನು", "ಸೋಮ", "ಮಂಗಳ", "ಬುಧ", "ಗುರು", "ಶುಕ್ರ", "ಶನಿ"];
+        } else if (language === 'ta') {
+          return [ "ஞாயிறு",  "திங்கள்",  "செவ்வாய்", "புதன்",  "வியாழன்",  "வெள்ளி",  "சனிக்கிழமை" ];
+        }
+        else if(language=='sa'){
+            return  [ "रविवासरः",  "सोमवासरः",  "मङ्गलवासरः",  "बुधवासरः", "गुरुवासरः",  "शुक्रवासरः",  "शनिवासरः"
+        ];
+
+        }
+        else if(language=="hi-IN"){
+            return["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
+        }
+       else if(language=="gom"){
+             return["आयतार",  "सोमार",  "मंगळार",  "बुधवार",  "गुरुवार", "शुक्रार", "शेंवार" ];
+
+          }
+          else if(language=="mr"){
+            return  ["रविवार", "सोमवार", "मंगळवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"  ];
+
+          }
+          else if(language=="te"){
+            return [ "ఆది",  "సోమ",  "మంగళ", "బుధ", "గురు", "శుక్ర","శని" ];
+          }
+        
+         else {
+        return ["ഞായർ", "തിങ്കൾ", "ചൊവ്വ", "ബുധൻ", "വ്യാഴം", "വെള്ളി", "ശനി" ];
+        }
+      }
+
+      function isSameDate(date1, date2) {
+        return date1.getFullYear() === date2.getFullYear() &&
+          date1.getMonth() === date2.getMonth() &&
+          date1.getDate() === date2.getDate();
+      }
+
+      document.getElementById('button').addEventListener('click', function () {
+        const element = document.getElementById('calendarPreview');
+    
+        // Apply styles for centering content
+       
+    
+        const options = {
+            margin: 10,
+            filename: 'calendar.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 3 },
+            jsPDF: {
+                unit: 'mm',
+                format: [180, 100],
+                orientation: 'landscape',
+                justifyFileContent: 'center', // This won't work, instead, apply styling directly to your content
+            },
+        };
+    
+        html2pdf(element, options);
+    });
+    
+    </script>
+    <script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+</body>
+</html>
